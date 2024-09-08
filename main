@@ -1,0 +1,28 @@
+import sys
+import os
+import PyQt5
+os.environ["XDG_RUNTIME_DIR"] = "/tmp/runtime-codespace"
+from PyQt5.QtWidgets import QApplication, QMainWindow
+
+#if you run this file on the codespace nothing will appear but it will sill work just without visuals
+#if you want to see stuff download this locally with it's dependcies and run it
+
+
+#os.environ["QT_QPA_PLATFORM"] = "offscreen" 
+
+
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+
+def startProgram():
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    startProgram()
+
+print("sup")
