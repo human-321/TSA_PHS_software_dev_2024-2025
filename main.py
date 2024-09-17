@@ -41,24 +41,42 @@ class threadController():
         # self.newThread = None
 
         # self.programEventLoopThread = self.setupForeverThread(programEventLoopThreadClass)
-        self.guiUpdateLoopThread = self.setupForeverThread(guiUpdateLoopThreadClass)
+
+        #setup logic threac
+        #region
+        self.worker = programEventLoopThreadClass()
 
 
-    def setupForeverThread(self, workerClass): 
-        self.worker = None
-        self.newThread = None
+        self.programEventLoopThread  = QThread()
 
 
-        self.newThread = QThread()
+        self.setupForeverThread(self.worker, self.programEventLoopThread)
 
-        self.worker = workerClass()
+        #endregion
 
-        self.worker.moveToThread(self.newThread) #this is fine
 
-        self.newThread.started.connect(self.worker.run)
-        self.newThread.start()
+        #setup gui thread
+        #region
+        self.guiworker = guiUpdateLoopThreadClass()
 
-        return self.newThread
+        self.guiUpdateLoopThread  = QThread()
+
+        self.setupForeverThread(self.guiworker, self.guiUpdateLoopThread)
+
+        #endregion
+
+
+    def setupForeverThread(self, paramworker, paramthread): 
+        
+
+
+
+        paramworker.moveToThread(paramthread) #this is fine
+
+        paramthread.started.connect(paramworker.run)
+        paramthread.start()
+
+        
 
 
 #ui
@@ -136,6 +154,7 @@ def programEventLoop():
     cell_manager.bootUpCellManager()
 
     while(True):
+        print("wassup")
         graphScreenWidthPercent = ((math.sin(time.thread_time()) + 1)/4)
         
         
@@ -165,7 +184,6 @@ def guiUpdateEventLoop():
             graphlayout.widget().setFixedWidth(round(window.width()*graphScreenWidthPercent))
 
 
-        window.mainLayout.children
         #str((windowWidth,windowHeight))
 
     
@@ -173,16 +191,6 @@ def guiUpdateEventLoop():
 #endregion   
    
 
-    # newThread = QThread()
-    # worker.moveToThread(newThread)
-    # newThread.started.connect(worker.run)
-    # newThread.start()
-    # return newThread
-    worker = workerClass()
-    newThread = QThread()
-    worker.moveToThread(newThread)
-    newThread.started.connect(worker.run)
-    newThread.start()
 
 def startProgram():
     global app
