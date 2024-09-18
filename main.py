@@ -17,9 +17,16 @@ mainColor = "#636363"
 secondaryColor = "#694c4c"
 
 
+#dependices pyqt5 sympy pylatex latex2sympy  ?aspose-tex-net
+
 #endregion
 
-#TODO send messeges between program logic and gui update threads
+#region
+
+
+#TODO -------------------     look at https://docs.aspose.com/tex/python-net/latex-to-image/  ---------------------
+
+
 print("\n\n\n\n\n")
 appName = "TSA PHS software devleopment submission"
 appIconImageLink = "assets\images\sigma.png"
@@ -28,7 +35,7 @@ MinWindowHeight = 500
 windowWidth = MinWindowWidth
 windowHeight = MinWindowHeight
 graphScreenWidthPercent = .5
-
+#endregion
 
 #if you run this file on the codespace nothing will appear but it will sill work just without visuals
 #if you want to see stuff download this locally with it's dependcies and run it
@@ -37,18 +44,12 @@ graphScreenWidthPercent = .5
 class threadController():
 
     def __init__(self):
-        # self.worker = None
-        # self.newThread = None
-
-        # self.programEventLoopThread = self.setupForeverThread(programEventLoopThreadClass)
 
         #setup logic threac
         #region
         self.worker = programEventLoopThreadClass()
 
-
         self.programEventLoopThread  = QThread()
-
 
         self.setupForeverThread(self.worker, self.programEventLoopThread)
 
@@ -106,6 +107,8 @@ class MainWindow(QMainWindow):
         graphScreen = QLabel("#2",self)
         cellEditorScreen = QListWidget(self)
 
+        #CSS
+        #region
         topBar.setStyleSheet("background-color: " + mainColor + ";"
                              "border-style: outset;"
                             "border-width: 2px;"
@@ -120,6 +123,7 @@ class MainWindow(QMainWindow):
                              "border-style: outset;"
                             "border-width: 2px;"
                             "border-color: " + secondaryColor + ";")
+        #endregion
         
         topBar.setMinimumHeight(int(windowWidth/10))
         cellEditorScreen.setMinimumWidth(0)
@@ -152,13 +156,12 @@ class programEventLoopThreadClass(QObject):
 
 def programEventLoop():
     cell_manager.bootUpCellManager()
+    t=0
 
     while(True):
-        print("wassup")
-        graphScreenWidthPercent = ((math.sin(time.thread_time()) + 1)/4)
-        
-        
-    #str((windowWidth,windowHeight))
+        #sigma
+        t += 1
+
 
     
     
