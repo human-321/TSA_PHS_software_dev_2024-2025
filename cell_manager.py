@@ -4,7 +4,10 @@ import sympy
 
 
 def addEmptycell():
-    cellList.append(cell(len(cellList)))
+    newCell = cell(len(cellList))
+    newCell.setCellContent("x^2")
+    newCell = cellList.append(newCell)
+    
 
 def bootUpCellManager():
     global cellList
@@ -16,10 +19,13 @@ class cell:
     def __init__(self,index):
         self.cellContent = ""
         self.cellIndex = index
-        self.cellRenderingSettings = cellRenderSettings(True)
+        self.cellRenderingData = cellRenderData(True)
+
+    def setCellContent(self,content):
+        self.cellContent = content
         
         
-class cellRenderSettings:
+class cellRenderData:
     def __init__(self,renderCell):
         self.renderCell = renderCell
     
