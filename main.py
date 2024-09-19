@@ -3,7 +3,9 @@ import os
 import time
 import math
 import PyQt5
+import PyQt5.QtWidgets
 import cell_manager
+import cell_renderer
 os.environ["XDG_RUNTIME_DIR"] = "/tmp/runtime-codespace"
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, 
                              QGridLayout, QLineEdit, QSizePolicy, QMenu, QMenuBar, QListWidget, 
@@ -96,6 +98,7 @@ class MainWindow(QMainWindow):
 
 
     def initUI(self):
+
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
 
@@ -119,14 +122,16 @@ class MainWindow(QMainWindow):
                             "border-width: 2px;"
                             "border-color: " + secondaryColor + ";")
         
-        cellEditorScreen.setStyleSheet("background-color: " + mainColor + ";"
-                             "border-style: outset;"
-                            "border-width: 2px;"
-                            "border-color: " + secondaryColor + ";")
+        # cellEditorScreen.setStyleSheet("background-color: " + mainColor + ";"
+        #                      "border-style: outset;"
+        #                     "border-width: 2px;"
+        #                     "border-color: " + secondaryColor + ";")
         #endregion
         
         topBar.setMinimumHeight(int(windowWidth/10))
-        cellEditorScreen.setMinimumWidth(0)
+        
+        
+        # cellEditorScreen.setMinimumWidth(0)
         self.editingLayout = QHBoxLayout()
         self.mainLayout = QVBoxLayout()
 
@@ -141,6 +146,16 @@ class MainWindow(QMainWindow):
         self.mainLayout.setContentsMargins(0,0,0,0)
         
         self.centralWidget.setLayout(self.mainLayout)
+
+
+    def setCellEditorToCellList(self):
+        if(len(cellEditorScreen) != len(cell_manager.cellList)):
+           #TODO delete layout and replace it with cell list
+        #    print(cellEditorScreen.children)
+            
+            cellEditorScreen.addItem("sigma")
+
+            
         
 
 
@@ -160,7 +175,8 @@ def programEventLoop():
 
     while(True):
         #sigma
-        t += 1
+        time.sleep(2)
+        cell_manager.addCellToBottom("x_{sigma}^{skidibi}")
 
 
     
@@ -186,8 +202,9 @@ def guiUpdateEventLoop():
 
             graphlayout.widget().setFixedWidth(round(window.width()*graphScreenWidthPercent))
 
+        MainWindow.setCellEditorToCellList(self=None)
 
-        #str((windowWidth,windowHeight))
+
 
     
     
