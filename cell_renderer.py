@@ -1,30 +1,45 @@
 import sympy
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, 
-                             QGridLayout, QLineEdit, QSizePolicy, QMenu, QMenuBar, QListWidget, 
-                             QAbstractScrollArea)
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
-from PIL import Image
-import cell_manager
-import main
+
+global cellList
+cellList = []
 
 
-print("sup makai")
+def addEmptycell():
+    newCell = cell("",len(cellList))
+    newCell.setCellContent("x^2")
+    newCell = cellList.append(newCell)
+    
 
-def makeWidgetFromCell(cell):
-    cellListItem = QHBoxLayout() #ea
-
-    label = QLabel(str(cell_manager.getCellIndex(cell)))
-
-    textEdit = QLineEdit()
-    textEdit.setText(cell_manager.getCellContent(cell))
+def bootUpCellManager():
+    global cellList 
+    cellList = []
+    addEmptycell()
 
 
-    cellListItem.addWidget(label)
-    cellListItem.addWidget(textEdit)
-    # textedit = QLabel(cell_manager.getCellContent(cell))
-    return textEdit
+class cell:
+    def __init__(self,contents,index):
+        self.cellContent = contents
+        self.cellIndex = index
+        self.cellRenderingData = cellRenderData(True)
 
-def clearVBoxLayout(layout: QVBoxLayout):
-    for i in reversed(range(  layout.count()  )):
-        layout.removeItem(layout.itemAt(i))
+    def setCellContent(self,content):
+        self.cellContent = content
+
+    
+        
+        
+class cellRenderData:
+    def __init__(self,renderCell):
+        self.renderCell = renderCell
+    
+
+def getCellContent(cell:cell):
+    return cell.cellContent
+
+def getCellIndex(cell:cell):
+    return cell.cellIndex
+
+def addCellToBottom(contents: str):
+   newCell = cell(contents,len(cellList))
+   cellList.append(newCell)
+   return newCell
