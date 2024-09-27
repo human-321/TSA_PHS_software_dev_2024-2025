@@ -33,10 +33,10 @@ class cellRenderData:
         self.renderCell = renderCell
     
 
-def getCellContent(cell):
+def getCellContent(cell:cell):
     return cell.cellContent
 
-def getCellIndex(cell):
+def getCellIndex(cell:cell):
     return cell.cellIndex
 
 def addCellToBottom(contents: str):
