@@ -55,7 +55,7 @@ def getListOfDrawListsForAnExplictFunction(string,widthPixel,heightPixel,graphCa
             j += result[1]
         
     #convert from magical mathmatical fantasy land coords to pixel coords
-    for k in range(len(verticeList)-1):
+    for k in range(0,len(verticeList),1):
         result = convertPointToPixelPoint(widthPixel,heightPixel,graphCamCenter,verticeList[k])
 
         output.append(result)
@@ -87,12 +87,12 @@ def convertPointToPixelPoint(widthPixel,heightPixel,graphCamCenter,point):
     # convert to pixel
     displacmentVector[0] /= xChangePerPixel
     displacmentVector[1] /= yChangePerPixel
-    displacmentVector[0] = math.floor(displacmentVector[0])
-    displacmentVector[1] = math.floor(displacmentVector[1])
+    displacmentVector[0] = round(displacmentVector[0])
+    displacmentVector[1] = round(displacmentVector[1])
     # now add the displacment back
-    center = [math.floor(widthPixel/2),math.floor(heightPixel/2)]
-    point = [displacmentVector[0] + center[0] , displacmentVector[1] + center[1]]
-
+    center = [round(widthPixel/2),round(heightPixel/2)]
+    point = [center[0] + displacmentVector[0]  , center[1] - displacmentVector[1]]
+    #TODO clamp pixel coords to screen cuz it will probably fuck up Qpainter
         
 
     
@@ -100,6 +100,6 @@ def convertPointToPixelPoint(widthPixel,heightPixel,graphCamCenter,point):
 
 
 print('\n\n\n\n\n')
-print(getListOfDrawListsForAnExplictFunction("x",50,50,[0,0]))
+print(getListOfDrawListsForAnExplictFunction("1/x",25,25,[0,0]))
 # print(loopThroughXVals(sympy.sympify("1/x"),0,50,[0,0]))
 print('\n\n\n\n\n')
