@@ -3,6 +3,10 @@ import os
 import time
 import math
 import PyQt5
+import PyQt5.Qt
+import cell_grapher
+import PyQt5.QtCore
+import PyQt5.QtGui
 import PyQt5.QtWidgets
 import cell_manager
 from cell_manager import cell as cellClass
@@ -11,8 +15,13 @@ os.environ["XDG_RUNTIME_DIR"] = "/tmp/runtime-codespace"
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QWidget, QVBoxLayout, QHBoxLayout, 
                              QGridLayout, QLineEdit, QSizePolicy, QMenu, QMenuBar, QListWidget, 
                              QScrollArea,QGroupBox)
-from PyQt5.QtGui import QIcon, QFont
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
+from PyQt5.QtGui import *
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QSize
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+from sympy.plotting import plot
+import sympy
+from sympy import *
 
 #if you run this file on the codespace nothing will appear but it will sill work just without visuals
 #if you want to see stuff download this locally with it's dependcies and run it
@@ -24,7 +33,7 @@ mainColor = "#636363"
 secondaryColor = "#694c4c"
 
 
-#dependices pyqt5 sympy pylatex latex2sympy  ?aspose-tex-net
+#dependices pyqt5 sympy numpy matplotlib
 
 #endregion
 
@@ -38,7 +47,7 @@ secondaryColor = "#694c4c"
 print("\n\n\n\n\n")
 appName = "TSA PHS software devleopment submission"
 appIconImageLink = "assets\images\sigma.png"
-MinWindowWidth = 500
+MinWindowWidth = 1500
 MinWindowHeight = 500
 windowWidth = MinWindowWidth
 windowHeight = MinWindowHeight
@@ -81,9 +90,10 @@ class threadController():
 class addCellToCellEditorSignalEmitter(QObject):
     addCellToCellEditorSignal = pyqtSignal(cellClass)
 
+
+
 global addCellToCellEditorSignalEmitterId
 addCellToCellEditorSignalEmitterId = addCellToCellEditorSignalEmitter()
-
 
 
 
@@ -103,10 +113,12 @@ class cellWidgetManager(QObject):
         cellWidgetLineEdit = QLineEdit()
         cellWidgetLineEdit.setText(cell_manager.getCellContent(cell))
         cellWidgetLineEdit.setFixedHeight(cellEditorScreenItemHeight)
-
+        cell.setCellWidget(cellWidgetLineEdit)
 
         cellEditorScreen.addWidget(cellWidgetLineEdit)
         self.myCellWidgets.append(cellWidgetLineEdit)
+
+        
         self.myCellWidgets.append(cellWidget())
 
     
@@ -136,9 +148,61 @@ def clearLayout(layout):
 
 
 #ui
+class graphCanvas(QLabel):
+    
+    def __init__(self,parent=None):
+        super().__init__(parent)
+        #settings
+        self.backgroundColor = QColor( 255, 255, 255, 255)
+        self.axisThickness = 20
+        
+        #region fuck me
+        self.pixmap = QPixmap(QSize(10000,10000))  
+        self.painter = QPainter(self.pixmap)
+        self.last_size = QSize()
+
+        self.pixmap.fill(self.backgroundColor)
+        self.setScaledContents(True)  # Enable scaling
+        self.update_pixmap()
+        #endregion
+
+
+    def update_pixmap(self):
+        self.pixmap.fill(self.backgroundColor)
+        width = self.pixmap.width()
+        height = self.pixmap.height()
+        center = [int(width/2),int(height/2)]
+        
+        pen = QPen(Qt.GlobalColor.black)
+        pen.setWidth(10)   
+        pen.setStyle(Qt.PenStyle.SolidLine)
+        pen.setBrush(QBrush(Qt.GlobalColor.black,Qt.BrushStyle.SolidPattern))
+        self.painter.setPen(pen)
+        self.painter.drawRect(0,center[1],width,self.axisThickness)
+        self.painter.drawRect(center[0],0,self.axisThickness,height)
+
+        
+
+
+        scaled_pixmap = self.pixmap.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio,Qt.TransformationMode.SmoothTransformation)  # Keep aspect ratio
+        self.setPixmap(scaled_pixmap)
+
+    def resizeEvent(self, event):
+        # Update pixmap when the label is resized
+        if self.size() != self.last_size:
+            self.update_pixmap()
+            self.last_size = self.size()
+    
+        super().resizeEvent(event)
+
+    
+ 
+
+
+
+    
+
 class MainWindow(QMainWindow):
-
-
 
     def __init__(self):
         super().__init__()
@@ -166,7 +230,9 @@ class MainWindow(QMainWindow):
         global cellEditorScreen
         
         topBar = QWidget(self)
-        graphScreen = QLabel("#2",self)
+        graphScreen = graphCanvas()
+        
+
         self.cellEditorScreenWrapper = QGroupBox()
         cellEditorScreen = QVBoxLayout()
         self.cellEditorScroll = QScrollArea()
@@ -177,7 +243,7 @@ class MainWindow(QMainWindow):
         cellEditorScreen.setAlignment(Qt.AlignmentFlag.AlignTop)
         
         
-        temp1 = cellClass("bibi",0)
+        temp1 = cellClass("sin(x)",0)
         cellWidgetManagerId.addCellToCellEditorScreen(temp1)
         #endregion
 
@@ -189,10 +255,10 @@ class MainWindow(QMainWindow):
                             "border-width: 2px;"
                             "border-color: " + secondaryColor + ";")
         
-        graphScreen.setStyleSheet("background-color: " + mainColor + ";"
-                             "border-style: outset;"
-                            "border-width: 2px;"
-                            "border-color: " + secondaryColor + ";")
+        # graphScreen.setStyleSheet("background-color: " + mainColor + ";"
+        #                      "border-style: outset;"
+        #                     "border-width: 2px;"
+        #                     "border-color: " + secondaryColor + ";")
         
 
         #endregion
@@ -209,9 +275,10 @@ class MainWindow(QMainWindow):
         # graphScreen.setFixedWidth(round(windowWidth*graphScreenWidthPercent))
 
         
-        policy = QSizePolicy(QSizePolicy.Policy.Expanding,QSizePolicy.Policy.Expanding)
-        
+        policy = QSizePolicy(QSizePolicy.Policy.MinimumExpanding,QSizePolicy.Policy.MinimumExpanding)
         graphScreen.setSizePolicy(policy)
+
+
         
         self.editingLayout.addWidget(graphScreen)
         self.editingLayout.addWidget(self.cellEditorScroll)
@@ -237,30 +304,29 @@ class MainWindow(QMainWindow):
         self.centralWidget.setLayout(self.mainLayout)
 
 
+
+
 #main logic loop 
 #region
 
 class programEventLoopThreadClass(QObject):
 
+
+
     def run(self):
         cell_manager.bootUpCellManager()
         
-        programEventLoop()   
+        programEventLoop(self)   
 
-def programEventLoop():
-    cell_manager.bootUpCellManager()
-    t=0
-
+def programEventLoop(orignator):
     while(True):
-        #sigma\
-        pass
-        # t+=1
-        # print("if u r seeing this u r a hoe" + str(t))
-        # cell_manager.addCellToBottom("x_{sigma}^{skidibi}")
+        cell_manager.updateCells()
 
 
-    
-    
+
+
+
+
 #endregion   
    
 # update UI loop 
@@ -280,19 +346,10 @@ class guiUpdateLoopThreadClass(QObject):
         guiUpdateEventLoop(self)
 
 
-
-    
-
-
 def guiUpdateEventLoop(orignator): # i may be the orignator but ... he is the duplicator -coachwilkes 2024
     
     while(True): 
         pass
-        #round(windowWidth*graphScreenWidthPercent)
-        # if(window != None):
-        #     graphlayout = window.editingLayout.itemAt(0)
-
-        #     graphlayout.widget().setFixedWidth(round(window.width()*graphScreenWidthPercent))
 
         
 
@@ -316,8 +373,10 @@ def startProgram():
 
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
+    
 
+    window.show()
+    
     
     
     
