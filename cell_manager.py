@@ -56,3 +56,4 @@ def addCellToBottom(contents: str):
    newCell = cell(contents,len(cellList))
    cellList.append(newCell)
    return newCell
+

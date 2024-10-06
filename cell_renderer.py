@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QWidget, QVBoxLa
                              QAbstractScrollArea)
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
-from PIL import Image
 import cell_manager
 import main
 
